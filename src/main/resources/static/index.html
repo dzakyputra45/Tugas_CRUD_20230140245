@@ -1,0 +1,286 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+
+    <meta charset="UTF-8">
+    <title>Dashboard KTP</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+    <script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+    <style>
+        body{
+        background:#f4f6f9;
+        }
+
+        .navbar-brand{
+        font-weight:bold;
+        }
+
+        .card{
+        border:none;
+        border-radius:10px;
+        }
+
+        .table{
+        border-radius:10px;
+        overflow:hidden;
+        }
+
+    </style>
+</head>
+<body>
+<nav class="navbar navbar-dark bg-dark mb-4">
+    <div class="container">
+<span class="navbar-brand">
+<i class="fa fa-id-card"></i> Sistem Manajemen KTP
+</span>
+    </div>
+</nav>
+<div class="container">
+    <div class="row">
+        <div class="col-md-4">
+            <div class="card shadow">
+                <div class="card-header bg-primary text-white">
+                    Tambah / Edit Data
+                </div>
+                <div class="card-body">
+                    <input type="hidden" id="id">
+                    <div class="mb-3">
+                        <label class="form-label">Nomor KTP</label>
+                        <input type="text" id="nomorKtp" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Nama Lengkap</label>
+                        <input type="text" id="namaLengkap" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Alamat</label>
+                        <input type="text" id="alamat" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Tanggal Lahir</label>
+                        <input type="date" id="tanggalLahir" class="form-control">
+                    </div>
+                    <div class="mb-3">
+                        <label class="form-label">Jenis Kelamin</label>
+                        <select id="jenisKelamin" class="form-select">
+                            <option value="Laki-laki">Laki-laki</option>
+                            <option value="Perempuan">Perempuan</option>
+                        </select>
+                    </div>
+                    <button class="btn btn-success w-100" onclick="simpan()">
+                        <i class="fa fa-save"></i> Simpan
+                    </button>
+                </div>
+            </div>
+        </div>
+
+
+        <div class="col-md-8">
+            <div class="card shadow">
+                <div class="card-header bg-dark text-white">
+                    Daftar Data KTP
+                </div>
+                <div class="card-body">
+                    <table class="table table-striped table-hover">
+                        <thead class="table-dark">
+                        <tr>
+
+                            <th>ID</th>
+                            <th>Nomor KTP</th>
+                            <th>Nama</th>
+                            <th>Alamat</th>
+                            <th>Aksi</th>
+
+                        </tr>
+                        </thead>
+                        <tbody id="dataKtp"></tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+<script>
+
+    const api = "http://localhost:8080/ktp"
+
+    $(document).ready(function(){
+    loadData()
+    })
+
+    function loadData(){
+    $.get(api,function(result){
+
+    let rows=""
+
+    result.forEach(function(data){
+
+    rows+=`
+    <tr>
+
+    <td>${data.id}</td>
+    <td>${data.nomorKtp}</td>
+    <td>${data.namaLengkap}</td>
+    <td>${data.alamat}</td>
+
+    <td>
+
+    <button class="btn btn-warning btn-sm" onclick="editData(${data.id})">
+    <i class="fa fa-edit"></i>
+    </button>
+
+    <button class="btn btn-danger btn-sm" onclick="hapus(${data.id})">
+    <i class="fa fa-trash"></i>
+    </button>
+
+    </td>
+    </tr>
+    `
+    })
+
+    $("#dataKtp").html(rows)
+
+    })
+    }
+
+
+    function simpan(){
+
+    let id = $("#id").val()
+
+    let data = {
+
+    nomorKtp: $("#nomorKtp").val(),
+    namaLengkap: $("#namaLengkap").val(),
+    alamat: $("#alamat").val(),
+    tanggalLahir: $("#tanggalLahir").val(),
+    jenisKelamin: $("#jenisKelamin").val()
+
+    }
+
+    if(id){
+
+    $.ajax({
+
+    url: api+"/"+id,
+    type:"PUT",
+    contentType:"application/json",
+    data:JSON.stringify(data),
+
+    success:function(){
+
+    alert("Data berhasil diupdate")
+    resetForm()
+    loadData()
+
+    },
+
+    error:function(xhr){
+
+    if(xhr.responseJSON){
+    alert(xhr.responseJSON.error)
+    }else{
+    alert("Terjadi kesalahan pada server")
+    }
+
+    }
+
+    })
+
+    }else{
+
+    $.ajax({
+
+    url: api,
+    type:"POST",
+    contentType:"application/json",
+    data:JSON.stringify(data),
+
+    success:function(){
+
+    alert("Data berhasil ditambahkan")
+    resetForm()
+    loadData()
+
+    },
+
+    error:function(xhr){
+
+    if(xhr.responseJSON){
+    alert(xhr.responseJSON.error)
+    }else{
+    alert("Terjadi kesalahan pada server")
+    }
+
+    }
+
+    })
+
+    }
+
+    }
+
+
+    function editData(id){
+
+    $.get(api+"/"+id,function(data){
+
+    $("#id").val(data.id)
+    $("#nomorKtp").val(data.nomorKtp)
+    $("#namaLengkap").val(data.namaLengkap)
+    $("#alamat").val(data.alamat)
+    $("#tanggalLahir").val(data.tanggalLahir)
+    $("#jenisKelamin").val(data.jenisKelamin)
+
+    })
+
+    }
+
+
+    function hapus(id){
+
+    if(confirm("Yakin ingin menghapus data?")){
+
+    $.ajax({
+
+    url: api+"/"+id,
+    type:"DELETE",
+
+    success:function(){
+
+    alert("Data berhasil dihapus")
+    loadData()
+
+    },
+
+    error:function(){
+
+    alert("Gagal menghapus data")
+
+    }
+
+    })
+
+    }
+
+    }
+
+
+    function resetForm(){
+
+    $("#id").val("")
+    $("#nomorKtp").val("")
+    $("#namaLengkap").val("")
+    $("#alamat").val("")
+    $("#tanggalLahir").val("")
+    $("#jenisKelamin").val("Laki-laki")
+
+    }
+
+</script>
+</body>
+</html>
