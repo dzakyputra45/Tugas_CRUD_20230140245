@@ -6,7 +6,8 @@
 
 
 ```
-<img width="1919" height="866" alt="image" src="https://github.com/user-attachments/assets/942e1944-44de-4eef-81e3-2751d0fe8de1" />
+<img width="1919" height="866" alt="Screenshot 2026-03-11 112621" src="https://github.com/user-attachments/assets/d0bfaea1-c0b2-4e84-ba48-1984dd9e5e8f" />
+
 
 ```
 
